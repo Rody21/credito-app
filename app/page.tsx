@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export default function Home() {
   const [cost, setCost] = useState("0");
@@ -14,6 +15,7 @@ export default function Home() {
   const [months, setMonths] = useState(12);
   const [productName, setProductName] = useState("");
   const [showWeekly, setShowWeekly] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const results = useMemo(() => {
     const costNumber =
@@ -62,14 +64,6 @@ export default function Home() {
       maximumFractionDigits: 0,
     }).format(value);
 
-  const formatNumber = (value: string) => {
-    const numbersOnly = value.replace(/\D/g, "");
-
-    return new Intl.NumberFormat("es-CO").format(
-      Number(numbersOnly || 0)
-    );
-  };
-
   const summary = `
 ${productName || "Producto"}
 
@@ -83,6 +77,12 @@ ${showWeekly
       : `Quincenal: ${currency(results.biweeklyPayment)}`
     }
 `.trim()
+  const costNumber =
+    Number(cost.replace(/\./g, "")) || 0;
+
+  const canGenerateSummary =
+    productName.trim().length > 0 &&
+    costNumber > 0;
 
   return (
     <main className="min-h-screen bg-slate-50 p-4">
@@ -257,21 +257,33 @@ ${showWeekly
                 />
               )}
 
-              {!productName.trim() && (
-                <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-600">
-                  Debe ingresar el nombre del producto para generar el resumen.
-                </div>
-              )}
-
               <Button
-                disabled={!productName.trim()}
+                disabled={!canGenerateSummary}
                 className="w-full"
                 onClick={() => {
                   navigator.clipboard.writeText(summary);
+
+                  toast.success("Resumen copiado al portapapeles");
                 }}
               >
                 Copiar resumen
               </Button>
+              {!productName.trim() && (
+                <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+                  Debe ingresar el nombre del producto.
+                </div>
+              )}
+
+              {costNumber <= 0 && (
+                <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+                  El costo del producto debe ser mayor a 0.
+                </div>
+              )}
+              {copied && (
+                <div className="rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700">
+                  Resumen copiado al portapapeles.
+                </div>
+              )}
 
               <Card className="mt-4">
                 <CardHeader>
