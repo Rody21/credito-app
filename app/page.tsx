@@ -1,325 +1,122 @@
-"use client";
-
-import { useMemo, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
+import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
+import CreditCalculator from "@/components/calculator/credit-calculator";
 
-export default function Home() {
-  const [cost, setCost] = useState("0");
-  const [profitPercentage, setProfitPercentage] = useState("40");
-  const [initialPercentage, setInitialPercentage] = useState("30");
-  const [hasInitialPayment, setHasInitialPayment] = useState(true);
-  const [months, setMonths] = useState(12);
-  const [productName, setProductName] = useState("");
-  const [showWeekly, setShowWeekly] = useState(false);
-  const [copied, setCopied] = useState(false);
-
-  const results = useMemo(() => {
-    const costNumber =
-      Number(cost.replace(/\./g, "")) || 0;
-    const profitNumber = Number(profitPercentage) || 0;
-    const initialNumber = Number(initialPercentage) || 0;
-
-    const salePrice =
-      costNumber + costNumber * (profitNumber / 100);
-
-    const initialPayment = hasInitialPayment
-      ? salePrice * (initialNumber / 100)
-      : 0;
-
-    const balance = salePrice - initialPayment;
-
-    const monthlyPayment =
-      months > 0 ? balance / months : 0;
-
-    const biweeklyPayment =
-      months > 0 ? balance / (months * 2) : 0;
-
-    const weeklyPayment =
-      months > 0 ? balance / (months * 4) : 0;
-
-    return {
-      salePrice,
-      initialPayment,
-      balance,
-      monthlyPayment,
-      biweeklyPayment,
-      weeklyPayment,
-    };
-  }, [
-    cost,
-    profitPercentage,
-    hasInitialPayment,
-    initialPercentage,
-    months,
-  ]);
-
-  const currency = (value: number) =>
-    new Intl.NumberFormat("es-CO", {
-      style: "currency",
-      currency: "COP",
-      maximumFractionDigits: 0,
-    }).format(value);
-
-  const summary = `
-${productName || "Producto"}
-
-Crédito ${months} meses: ${currency(results.salePrice)}
-${hasInitialPayment
-      ? `Inicial: ${currency(results.initialPayment)}`
-      : "Sin cuota inicial"
-    }
-${showWeekly
-      ? `Semanal: ${currency(results.weeklyPayment)}`
-      : `Quincenal: ${currency(results.biweeklyPayment)}`
-    }
-`.trim()
-  const costNumber =
-    Number(cost.replace(/\./g, "")) || 0;
-
-  const canGenerateSummary =
-    productName.trim().length > 0 &&
-    costNumber > 0;
-
+export default function HomePage() {
   return (
-    <main className="min-h-screen bg-slate-50 p-4">
-      <div className="mx-auto max-w-6xl">
-        <h1 className="mb-6 text-3xl font-bold">
-          Calculadora de Créditos
-        </h1>
+    <main className="min-h-screen bg-slate-50">
+      <header className="border-b bg-white">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+          <Image
+            src="/logo-plg.png"
+            alt="PLG Capital"
+            width={180}
+            height={60}
+            priority
+          />
 
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Configuración</CardTitle>
-            </CardHeader>
-
-            <CardContent className="space-y-5">
-              <div>
-                <label className="mb-2 block text-sm">
-                  Nombre del producto
-                </label>
-                <Input
-                  value={productName}
-                  onChange={(e) => setProductName(e.target.value)}
-                  placeholder="Nombre del producto"
-                />
-              </div>
-              <div>
-                <label className="mb-2 block text-sm">
-                  Costo del producto
-                </label>
-                <Input
-                  type="text"
-                  placeholder="500.000"
-                  inputMode="numeric"
-                  value={cost}
-                  onChange={(e) => {
-                    const rawValue =
-                      e.target.value.replace(/\D/g, "");
-
-                    setCost(
-                      new Intl.NumberFormat("es-CO").format(
-                        Number(rawValue || 0)
-                      )
-                    );
-                  }}
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block text-sm">
-                  % Utilidad
-                </label>
-                <Input
-                  type="number"
-                  value={profitPercentage}
-                  onChange={(e) =>
-                    setProfitPercentage(
-                      e.target.value
-                    )
-                  }
-                />
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  checked={hasInitialPayment}
-                  onCheckedChange={(checked) =>
-                    setHasInitialPayment(checked === true)
-                  }
-                />
-                <label>Con cuota inicial</label>
-              </div>
-
-              {hasInitialPayment && (
-                <div>
-                  <label className="mb-2 block text-sm">
-                    % Cuota inicial
-                  </label>
-                  <Input
-                    type="number"
-                    value={initialPercentage}
-                    onChange={(e) =>
-                      setInitialPercentage(
-                        e.target.value
-                      )
-                    }
-                  />
-                </div>
-              )}
-
-              <div>
-                <label className="mb-2 block text-sm">
-                  Financiación
-                </label>
-
-                <div className="flex gap-2">
-                  <button
-                    className={`rounded-md border px-4 py-2 ${months === 6
-                      ? "bg-slate-900 text-white"
-                      : ""
-                      }`}
-                    onClick={() => setMonths(6)}
-                  >
-                    6 Meses
-                  </button>
-
-                  <button
-                    className={`rounded-md border px-4 py-2 ${months === 12
-                      ? "bg-slate-900 text-white"
-                      : ""
-                      }`}
-                    onClick={() => setMonths(12)}
-                  >
-                    12 Meses
-                  </button>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  checked={showWeekly}
-                  onCheckedChange={(checked) =>
-                    setShowWeekly(checked === true)
-                  }
-                />
-
-                <label>Mostrar pago semanal</label>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Resultados</CardTitle>
-            </CardHeader>
-
-            <CardContent className="space-y-4">
-              <ResultRow
-                label="Valor venta"
-                value={currency(results.salePrice)}
-              />
-
-              <ResultRow
-                label="Cuota inicial"
-                value={currency(results.initialPayment)}
-              />
-
-              <ResultRow
-                label="Saldo financiado"
-                value={currency(results.balance)}
-              />
-
-              <ResultRow
-                label="Pago mensual"
-                value={currency(
-                  results.monthlyPayment
-                )}
-              />
-
-              <ResultRow
-                label="Pago quincenal"
-                value={currency(
-                  results.biweeklyPayment
-                )}
-              />
-
-              {showWeekly && (
-                <ResultRow
-                  label="Pago semanal"
-                  value={currency(
-                    results.weeklyPayment
-                  )}
-                  active
-                />
-              )}
-
-              <Button
-                disabled={!canGenerateSummary}
-                className="w-full"
-                onClick={() => {
-                  navigator.clipboard.writeText(summary);
-
-                  toast.success("Resumen copiado al portapapeles");
-                }}
-              >
-                Copiar resumen
-              </Button>
-              {!productName.trim() && (
-                <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-600">
-                  Debe ingresar el nombre del producto.
-                </div>
-              )}
-
-              {costNumber <= 0 && (
-                <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-600">
-                  El costo del producto debe ser mayor a 0.
-                </div>
-              )}
-              {copied && (
-                <div className="rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700">
-                  Resumen copiado al portapapeles.
-                </div>
-              )}
-
-              <Card className="mt-4">
-                <CardHeader>
-                  <CardTitle>Vista previa</CardTitle>
-                </CardHeader>
-
-                <CardContent>
-                  <pre className="whitespace-pre-wrap text-sm">
-                    {summary}
-                  </pre>
-                </CardContent>
-              </Card>
-            </CardContent>
-          </Card>
+          <Button asChild>
+            <Link href="/login">
+              Iniciar Sesión
+            </Link>
+          </Button>
         </div>
-      </div>
-    </main>
-  );
-}
+      </header>
 
-function ResultRow({
-  label,
-  value,
-  active = false,
-}: {
-  label: string;
-  value: string;
-  active?: boolean;
-}) {
-  return (
-    <div
-      className={`flex items-center justify-between rounded-lg border p-3 ${active ? "border-slate-900" : ""
-        }`}
-    >
-      <span>{label}</span>
-      <strong>{value}</strong>
-    </div>
+      <section className="mx-auto max-w-7xl px-6 py-20">
+        <div className="grid items-center gap-12 md:grid-cols-2">
+          <div>
+            <h1 className="mb-6 text-5xl font-bold text-slate-900">
+              Financiamiento simple y transparente
+            </h1>
+
+            <p className="mb-8 text-lg text-slate-600">
+              En PLG Capital ofrecemos soluciones de crédito diseñadas para
+              ayudarte a adquirir productos y alcanzar tus metas con cuotas
+              flexibles y condiciones claras.
+            </p>
+
+            <Button asChild size="lg">
+              <a href="#simulador">
+                Simular Crédito
+              </a>
+            </Button>
+          </div>
+
+          <div className="flex justify-center">
+            <Image
+              src="/logo-plg.png"
+              alt="PLG Capital"
+              width={500}
+              height={500}
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-20">
+        <div className="mx-auto max-w-6xl px-6">
+          <h2 className="mb-12 text-center text-3xl font-bold">
+            ¿Por qué elegir PLG Capital?
+          </h2>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            <div className="rounded-xl border bg-white p-6">
+              <h3 className="mb-3 text-xl font-semibold">
+                Proceso Ágil
+              </h3>
+
+              <p className="text-slate-600">
+                Evaluaciones rápidas y atención personalizada para cada cliente.
+              </p>
+            </div>
+
+            <div className="rounded-xl border bg-white p-6">
+              <h3 className="mb-3 text-xl font-semibold">
+                Pagos Flexibles
+              </h3>
+
+              <p className="text-slate-600">
+                Diferentes alternativas de pago adaptadas a cada necesidad.
+              </p>
+            </div>
+
+            <div className="rounded-xl border bg-white p-6">
+              <h3 className="mb-3 text-xl font-semibold">
+                Transparencia
+              </h3>
+
+              <p className="text-slate-600">
+                Condiciones claras desde el inicio y sin sorpresas.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="simulador"
+        className="mx-auto max-w-7xl px-6 py-20"
+      >
+        <div className="mb-10 text-center">
+          <h2 className="mb-4 text-4xl font-bold">
+            Simulador de Crédito
+          </h2>
+
+          <p className="text-slate-600">
+            Calcula cuotas, valor financiado e inicial en segundos.
+          </p>
+        </div>
+
+        <CreditCalculator />
+      </section>
+
+      <footer className="border-t bg-white py-10">
+        <div className="mx-auto max-w-7xl px-6 text-center text-slate-600">
+          © {new Date().getFullYear()} PLG Capital. Todos los derechos reservados.
+        </div>
+      </footer>
+    </main>
   );
 }

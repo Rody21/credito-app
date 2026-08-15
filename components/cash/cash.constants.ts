@@ -1,0 +1,10 @@
+export const EXPENSE_CATEGORIES = [
+  'TRANSPORT',
+  'INVENTORY',
+  'SERVICES',
+  'STATIONERY',
+  'MAINTENANCE',
+  'OTHER',
+];
+
+export const INCOME_CATEGORIES = ['OTHER_INCOME'];

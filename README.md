@@ -1,36 +1,165 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PLG Capital - Sistema de Crédito
 
-## Getting Started
+Aplicación web moderna para administrar ventas a crédito, clientes, pagos e inversionistas. Construida con Next.js 16, TypeScript, Tailwind CSS y Supabase.
 
-First, run the development server:
+## 🚀 Quick Start
+
+### Requisitos previos
+- Node.js 18+
+- npm o yarn
+- Acceso a Supabase
+
+### Instalación
 
 ```bash
+# Instalar dependencias
+npm install
+
+# Configurar variables de entorno (.env.local)
+# - NEXT_PUBLIC_SUPABASE_URL
+# - NEXT_PUBLIC_SUPABASE_ANON_KEY
+# - SUPABASE_SERVICE_ROLE_KEY
+
+# Iniciar servidor de desarrollo
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📋 Comandos disponibles
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run dev      # Inicia servidor de desarrollo
+npm run build    # Compila para producción
+npm run start    # Inicia servidor de producción
+npm run lint     # Ejecuta validaciones de código
+```
 
-## Learn More
+## 🏗️ Arquitectura del proyecto
 
-To learn more about Next.js, take a look at the following resources:
+### Estructura de carpetas
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+credito-app/
+├── app/                    # Rutas y layouts de Next.js
+│   ├── api/               # Endpoints API
+│   ├── dashboard/         # Panel de administración
+│   │   ├── caja/          # Movimientos de caja
+│   │   ├── clientes/      # Gestión de clientes
+│   │   ├── configuracion/ # Configuración general
+│   │   ├── pagos/         # Gestión de pagos
+│   │   ├── productos/     # Catálogo de productos
+│   │   └── ventas/        # Registro de ventas
+│   └── login/             # Autenticación
+├── components/            # Componentes React reutilizables
+│   ├── calculator/        # Calculadora de créditos
+│   ├── cash/              # Componentes de caja
+│   ├── customers/         # Componentes de clientes
+│   ├── dashboard/         # Componentes del panel
+│   ├── payments/          # Componentes de pagos
+│   ├── sales/             # Componentes de ventas
+│   ├── shared/            # Componentes compartidos
+│   └── ui/                # Componentes base de UI
+├── lib/                   # Funciones y utilidades del servidor
+│   ├── supabase/          # Configuración de Supabase
+│   ├── cash/              # Lógica de caja
+│   ├── payments/          # Lógica de pagos
+│   ├── products/          # Lógica de productos
+│   ├── sales/             # Lógica de ventas
+│   └── customers.ts       # Funciones de clientes
+├── types/                 # Tipos de TypeScript
+│   └── database.ts        # Tipos de base de datos
+├── docs/                  # Documentación técnica
+└── public/                # Archivos estáticos
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📦 Stack tecnológico
 
-## Deploy on Vercel
+| Tecnología | Versión | Propósito |
+|------------|---------|----------|
+| Next.js | 16 | Framework de React |
+| TypeScript | - | Lenguaje tipado |
+| Tailwind CSS | - | Estilos utility-first |
+| Supabase | - | Backend PostgreSQL + Auth |
+| Vercel | - | Hosting y deployment |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🔐 Control de acceso
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Solo desarrolladores y administradores** tienen acceso a:
+- Módulos de caja (Caja)
+- Dashboards administrativos
+- Configuración del sistema
+- Datos financieros sensibles
+
+Esta restricción se valida en:
+- Middleware de autenticación
+- Level de API endpoints
+- Validaciones en componentes
+
+## 📊 Estado de módulos
+
+### ✅ Funcionales
+- **Productos**: Creación, lectura, actualización y eliminación
+- **Clientes**: Gestión completa de cliente
+
+### 🟡 En desarrollo
+- **Ventas**: Funcionalidad básica implementada
+  - Pendiente: Validaciones avanzadas, reportes
+- **Pagos**: Funcionalidad base
+  - Tabla: `payments`
+- **Cuotas**: Estructura inicial
+  - Tablas: `sale_installments`, `installments`
+  - Requiere: Validación de tabla oficial
+- **Caja**: Funcionalidad básica
+  - Tabla: `cash_movements`
+
+### ⏳ Pendientes
+- **Inversionistas**: Diseño completo
+- **Distribución de utilidades**: Diseño completo
+- **Dashboard financiero**: En planificación
+- **Sistema de reportes**: En planificación
+
+## 🛠️ Reglas de desarrollo
+
+### TypeScript y código
+- ✅ Utilizar TypeScript estricto en todos los archivos
+- ✅ Reutilizar componentes existentes antes de crear nuevos
+- ✅ No crear archivos duplicados
+- ✅ Mantener la estructura actual del proyecto
+
+### Base de datos
+- ✅ Supabase PostgreSQL
+- ✅ Todos los cambios mediante migraciones SQL
+- ✅ Nunca modificar tablas manualmente en producción
+- ✅ Todas las consultas deben pasar por funciones reutilizables en `lib/`
+
+### Antes de implementar cambios
+1. Analizar impacto en otros módulos
+2. Identificar archivos afectados
+3. Presentar plan de implementación
+4. Implementar cambios
+5. Ejecutar `npm run build` y corregir errores
+
+## 📚 Documentación adicional
+
+- [database-schema.md](docs/database-schema.md) - Esquema de base de datos
+- [business-rules.md](docs/business-rules.md) - Reglas de negocio
+- [project-context.md](docs/project-context.md) - Contexto general del proyecto
+- [roadmap.md](docs/roadmap.md) - Hoja de ruta
+
+## 🚀 Deployment
+
+El proyecto está configurado para deployar en **Vercel**. Cada push a la rama principal dispara un build automático.
+
+## 📝 Variables de entorno
+
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+
+# Vercel (automático)
+VERCEL_ENV=
+VERCEL_GIT_COMMIT_SHA=
+```
